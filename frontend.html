@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Sovereign Identity Wallet</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #4fc3a1;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 30px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--success);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .content-area {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            min-height: 600px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+            color: var(--secondary);
+        }
+
+        .card {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .credential-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .credential-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease;
+        }
+
+        .credential-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .credential-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .credential-issuer {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .credential-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        .status-valid {
+            background-color: #e8f5e9;
+            color: var(--success);
+        }
+
+        .status-revoked {
+            background-color: #ffebee;
+            color: var(--danger);
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .verification-result {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            display: none;
+        }
+
+        .verification-success {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--success);
+            display: block;
+        }
+
+        .verification-failure {
+            background-color: #ffebee;
+            border-left: 4px solid var(--danger);
+            display: block;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+        }
+
+        .disclosure-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .disclosure-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: 2;
+            }
+            
+            .content-area {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🔐</div>
+                    <h1>Self-Sovereign Identity Wallet</h1>
+                </div>
+                <div class="wallet-status">
+                    <div class="status-indicator"></div>
+                    <span>Wallet Connected</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-target="dashboard">
+                        <span>📊</span> Dashboard
+                    </li>
+                    <li class="nav-item" data-target="credentials">
+                        <span>📄</span> My Credentials
+                    </li>
+                    <li class="nav-item" data-target="requests">
+                        <span>🔍</span> Verification Requests
+                    </li>
+                    <li class="nav-item" data-target="disclosure">
+                        <span>🔒</span> Selective Disclosure
+                    </li>
+                    <li class="nav-item" data-target="settings">
+                        <span>⚙️</span> Settings
+                    </li>
+                </ul>
+            </div>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="section active">
+                    <h2 class="section-title">Dashboard</h2>
+                    <div class="card">
+                        <h3>Welcome to Your Identity Wallet</h3>
+                        <p>Your self-sovereign identity wallet gives you full control over your digital identity and credentials.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Wallet Summary</h3>
+                        </div>
+                        <div class="summary-stats">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                                <div>
+                                    <h4>Decentralized Identifier (DID)</h4>
+                                    <p id="did-display">did:example:123456789abcdef</p>
+                                </div>
+                                <div>
+                                    <h4>Stored Credentials</h4>
+                                    <p id="credential-count">5 credentials</p>
+                                </div>
+                                <div>
+                                    <h4>Blockchain Network</h4>
+                                    <p>Ethereum Mainnet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-item" style="padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Verified Aadhaar credential</span>
+                                    <span style="color: #6c757d;">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item" style="padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Shared education credentials with University</span>
+                                    <span style="color: #6c757d;">1 day ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item" style="padding: 10px 0;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Received PAN credential from Income Tax Dept.</span>
+                                    <span style="color: #6c757d;">3 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credentials Section -->
+                <div id="credentials" class="section">
+                    <h2 class="section-title">My Credentials</h2>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Stored Verifiable Credentials</h3>
+                            <button class="btn btn-primary" id="add-credential-btn">
+                                <span>+</span> Add Credential
+                            </button>
+                        </div>
+                        <div class="credential-list">
+                            <div class="credential-card">
+                                <div class="credential-icon">🆔</div>
+                                <h4>Aadhaar Card</h4>
+                                <div class="credential-issuer">Issued by: UIDAI</div>
+                                <p>Digital identity credential</p>
+                                <div class="credential-status status-valid">Valid</div>
+                            </div>
+                            <div class="credential-card">
+                                <div class="credential-icon">💳</div>
+                                <h4>PAN Card</h4>
+                                <div class="credential-issuer">Issued by: Income Tax Dept.</div>
+                                <p>Permanent Account Number</p>
+                                <div class="credential-status status-valid">Valid</div>
+                            </div>
+                            <div class="credential-card">
+                                <div class="credential-icon">🎓</div>
+                                <h4>University Degree</h4>
+                                <div class="credential-issuer">Issued by: University of Technology</div>
+                                <p>Bachelor of Computer Science</p>
+                                <div class="credential-status status-valid">Valid</div>
+                            </div>
+                            <div class="credential-card">
+                                <div class="credential-icon">🚗</div>
+                                <h4>Driver's License</h4>
+                                <div class="credential-issuer">Issued by: RTO</div>
+                                <p>Driving credential</p>
+                                <div class="credential-status status-valid">Valid</div>
+                            </div>
+                            <div class="credential-card">
+                                <div class="credential-icon">🏥</div>
+                                <h4>Vaccination Certificate</h4>
+                                <div class="credential-issuer">Issued by: Health Ministry</div>
+                                <p>COVID-19 vaccination record</p>
+                                <div class="credential-status status-revoked">Expired</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Requests Section -->
+                <div id="requests" class="section">
+                    <h2 class="section-title">Verification Requests</h2>
+                    <div class="card">
+                        <h3>Pending Verification Requests</h3>
+                        <div class="verification-request" style="padding: 15px; border: 1px solid #e9ecef; border-radius: var(--border-radius); margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4>Bank Account Opening</h4>
+                                    <p>Global Bank requests identity verification</p>
+                                    <p style="font-size: 0.9rem; color: #6c757d;">Requested: Today, 10:30 AM</p>
+                                </div>
+                                <button class="btn btn-primary verify-request-btn" data-request="bank">Verify</button>
+                            </div>
+                        </div>
+                        <div class="verification-request" style="padding: 15px; border: 1px solid #e9ecef; border-radius: var(--border-radius); margin: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4>University Application</h4>
+                                    <p>Tech University requests education credentials</p>
+                                    <p style="font-size: 0.9rem; color: #6c757d;">Requested: Yesterday, 2:15 PM</p>
+                                </div>
+                                <button class="btn btn-primary verify-request-btn" data-request="university">Verify</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Verification History</h3>
+                        <div style="margin-top: 15px;">
+                            <div style="padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Employment Verification - ABC Corp</span>
+                                    <span style="color: var(--success);">Verified</span>
+                                </div>
+                                <p style="font-size: 0.9rem; color: #6c757d;">5 days ago</p>
+                            </div>
+                            <div style="padding: 10px 0;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Rental Application - XYZ Apartments</span>
+                                    <span style="color: var(--success);">Verified</span>
+                                </div>
+                                <p style="font-size: 0.9rem; color: #6c757d;">2 weeks ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selective Disclosure Section -->
+                <div id="disclosure" class="section">
+                    <h2 class="section-title">Selective Disclosure</h2>
+                    <div class="card">
+                        <h3>Share Specific Information</h3>
+                        <p>Select which information to share from your credentials without revealing the entire document.</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Select Credential</label>
+                            <select class="form-control" id="credential-select">
+                                <option value="aadhaar">Aadhaar Card</option>
+                                <option value="pan">PAN Card</option>
+                                <option value="degree">University Degree</option>
+                                <option value="license">Driver's License</option>
+                            </select>
+                        </div>
+
+                        <div id="aadhaar-disclosure" class="disclosure-options">
+                            <h4>Available Information from Aadhaar</h4>
+                            <div class="disclosure-controls">
+                                <div class="disclosure-option">
+                                    <input type="checkbox" id="aadhaar-name" checked>
+                                    <label for="aadhaar-name">Full Name</label>
+                                </div>
+                                <div class="disclosure-option">
+                                    <input type="checkbox" id="aadhaar-dob">
+                                    <label for="aadhaar-dob">Date of Birth</label>
+                                </div>
+                                <div class="disclosure-option">
+                                    <input type="checkbox" id="aadhaar-gender">
+                                    <label for="aadhaar-gender">Gender</label>
+                                </div>
+                                <div class="disclosure-option">
+                                    <input type="checkbox" id="aadhaar-address">
+                                    <label for="aadhaar-address">Address</label>
+                                </div>
+                                <div class="disclosure-option">
+                                    <input type="checkbox" id="aadhaar-number">
+                                    <label for="aadhaar-number">Aadhaar Number</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Recipient DID (Optional)</label>
+                            <input type="text" class="form-control" placeholder="Enter recipient's DID">
+                        </div>
+
+                        <button class="btn btn-success" id="generate-proof-btn">
+                            <span>🔒</span> Generate Zero-Knowledge Proof
+                        </button>
+
+                        <div class="qr-code" id="proof-qr">
+                            <p>Proof QR Code will appear here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div id="settings" class="section">
+                    <h2 class="section-title">Settings</h2>
+                    <div class="card">
+                        <h3>Wallet Configuration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Blockchain Network</label>
+                            <select class="form-control">
+                                <option>Ethereum Mainnet</option>
+                                <option>Polygon</option>
+                                <option>Binance Smart Chain</option>
+                                <option>Local Testnet</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">IPFS Gateway</label>
+                            <input type="text" class="form-control" value="https://ipfs.io/ipfs/">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Default Privacy Level</label>
+                            <select class="form-control">
+                                <option>Minimum Disclosure</option>
+                                <option>Selective Disclosure</option>
+                                <option>Full Disclosure</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary">Save Settings</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Security</h3>
+                        <div class="form-group">
+                            <label class="form-label">Backup Wallet</label>
+                            <p>Download an encrypted backup of your wallet</p>
+                            <button class="btn btn-outline">Backup Wallet</button>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Revoke All Sessions</label>
+                            <p>Sign out from all connected applications</p>
+                            <button class="btn btn-outline">Revoke Sessions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Self-Sovereign Identity Wallet - Empowering users with control over their digital identity</p>
+        <p>Built with Blockchain, IPFS, and Verifiable Credentials</p>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all nav items
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                // Add active class to clicked nav item
+                this.classList.add('active');
+                
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show the target section
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Verification request functionality
+        document.querySelectorAll('.verify-request-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const requestType = this.getAttribute('data-request');
+                let message = '';
+                
+                if (requestType === 'bank') {
+                    message = 'Bank verification process initiated. Please select which credentials to share.';
+                } else if (requestType === 'university') {
+                    message = 'University verification process initiated. Please select which credentials to share.';
+                }
+                
+                alert(message);
+                
+                // In a real implementation, this would open a credential selection interface
+                // For this demo, we'll just show a success message after a delay
+                setTimeout(() => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'verification-result verification-success';
+                    resultDiv.innerHTML = `
+                        <h4>Verification Successful!</h4>
+                        <p>Your credentials have been successfully verified and shared with the requesting party.</p>
+                        <p><strong>Transaction Hash:</strong> 0x8a3b7c...e4f5</p>
+                    `;
+                    
+                    this.parentElement.parentElement.appendChild(resultDiv);
+                    this.style.display = 'none';
+                }, 2000);
+            });
+        });
+
+        // Selective disclosure functionality
+        document.getElementById('generate-proof-btn').addEventListener('click', function() {
+            const credentialType = document.getElementById('credential-select').value;
+            const qrCode = document.getElementById('proof-qr');
+            
+            // Show loading state
+            qrCode.innerHTML = '<p>Generating zero-knowledge proof...</p>';
+            
+            // Simulate proof generation
+            setTimeout(() => {
+                qrCode.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="width: 150px; height: 150px; background: #333; margin: 0 auto;"></div>
+                        <p style="margin-top: 10px;">Zero-Knowledge Proof</p>
+                        <p style="font-size: 0.8rem;">Scan to verify selected information</p>
+                    </div>
+                `;
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'verification-result verification-success';
+                successMsg.innerHTML = `
+                    <h4>Proof Generated Successfully!</h4>
+                    <p>Your selective disclosure proof has been created. Share the QR code with the verifier.</p>
+                `;
+                
+                qrCode.parentElement.insertBefore(successMsg, qrCode);
+            }, 1500);
+        });
+
+        // Credential selection change
+        document.getElementById('credential-select').addEventListener('change', function() {
+            // In a real implementation, this would update the disclosure options
+            // based on the selected credential type
+            console.log('Credential type changed to:', this.value);
+        });
+
+        // Add credential button
+        document.getElementById('add-credential-btn').addEventListener('click', function() {
+            alert('In a real implementation, this would open a credential import interface.');
+        });
+
+        // Simulate blockchain interaction
+        function simulateBlockchainInteraction() {
+            console.log('Simulating blockchain interaction...');
+            // In a real implementation, this would interact with a blockchain
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Self-Sovereign Identity Wallet initialized');
+            simulateBlockchainInteraction();
+        });
+    </script>
+</body>
+</html>
